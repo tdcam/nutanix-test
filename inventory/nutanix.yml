@@ -1,0 +1,5 @@
+plugin: ansible_collections.nutanix.ncp.plugins.inventory.ntnx_prism_vm_inventory
+host: "{{ lookup('env', 'NUTANIX_HOST') }}"
+username: "{{ lookup('env', 'NUTANIX_USERNAME') }}"
+password: "{{ lookup('env', 'NUTANIX_PASSWORD') }}"
+validate_certs: "{{ lookup('env','NUTANIX_VALIDATE_CERTS') | default('false') | bool }}"
