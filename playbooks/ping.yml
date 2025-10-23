@@ -1,0 +1,8 @@
+---
+- name: Test connectivity to Nutanix VMs
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Ping each VM
+      ansible.builtin.ping:
+
