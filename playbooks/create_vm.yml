@@ -1,4 +1,6 @@
 ---
+# NOTE THIS IS AI GENERATED AND I CANNOT TEST IT
+# IT IS PROBABLY WRONG
 - name: Create a VM on Nutanix (Prism Central/Element)
   hosts: localhost
   connection: local
