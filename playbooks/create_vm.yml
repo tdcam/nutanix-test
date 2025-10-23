@@ -1,0 +1,11 @@
+- name: Create a VM on Nutanix
+  nutanix.ncp.ntnx_vms:
+    prism_host: "{{ lookup('env','NUTANIX_HOST') }}"
+    username: "{{ lookup('env','NUTANIX_USERNAME') }}"
+    password: "{{ lookup('env','NUTANIX_PASSWORD') }}"
+    validate_certs: false
+    state: present
+    name: test-vm
+    memory_gb: 4
+    vcpus: 2
+
