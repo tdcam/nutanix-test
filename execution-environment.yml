@@ -1,0 +1,19 @@
+version: 3
+images:
+  base_image:
+    name: registry.redhat.io/ansible-automation-platform-25/ee-minimal-rhel8:latest
+dependencies:
+  ansible_core:
+    package_pip: ansible-core
+  ansible_runner:
+    package_pip: ansible-runner
+  galaxy:
+    collections:
+      - name: ansible.network
+      - name: ansible.posix
+      - name: ansible.utils
+      - name: nutanix.ncp
+options:
+  tags:
+    - ee-minimal-rhel8-nutanix
+  package_manager_path: /usr/bin/microdnf
