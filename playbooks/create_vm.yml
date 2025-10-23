@@ -1,11 +1,88 @@
 ---
-- name: Create a VM on Nutanix
-  nutanix.ncp.ntnx_vms:
-    prism_host: "{{ lookup('env','NUTANIX_HOST') }}"
-    username: "{{ lookup('env','NUTANIX_USERNAME') }}"
-    password: "{{ lookup('env','NUTANIX_PASSWORD') }}"
-    validate_certs: false
-    state: present
-    name: test-vm
-    memory_gb: 4
+- name: Create a VM on Nutanix (Prism Central/Element)
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  # Use short module names by declaring the collection
+  collections:
+    - nutanix.ncp
+
+  # ---- Defaults (tune these or pass as extra vars) ----
+  vars:
+    # Nutanix authentication (provided via AAP Credential injectors)
+    ntnx_host: "{{ lookup('env','NUTANIX_HOST') }}"
+    ntnx_username: "{{ lookup('env','NUTANIX_USERNAME') }}"
+    ntnx_password: "{{ lookup('env','NUTANIX_PASSWORD') }}"
+    ntnx_validate_certs: "{{ (lookup('env','NUTANIX_VALIDATE_CERTS') | default('false')) | bool }}"
+
+    # VM settings (change for your environment or set as survey/extra vars)
+    vm_name: "demo-vm-01"
+    vm_description: "Created by Ansible"
+    cluster_name: "MyCluster"
+    subnet_name: "VLAN10"         # Prism subnet name
+    image_name: "RHEL-9-golden"   # Prism image to clone for the OS disk
     vcpus: 2
+    cores_per_vcpu: 1
+    memory_gb: 4
+    disk_gb: 40                   # OS disk size in GB
+    boot_type: "UEFI"             # LEGACY | UEFI | SECURE_BOOT
+    power_on: true                # power state after create
+
+    # Optional: basic cloud-init customization (uncomment task block below)
+    use_cloud_init: false
+    cloud_init_path: "files/cloud_init_basic.yaml"
+
+  tasks:
+    - name: Create (or reconcile) the VM
+      ntnx_vms:
+        nutanix_host: "{{ ntnx_host }}"
+        nutanix_username: "{{ ntnx_username }}"
+        nutanix_password: "{{ ntnx_password }}"
+        validate_certs: "{{ ntnx_validate_certs }}"
+        state: present
+        name: "{{ vm_name }}"
+        desc: "{{ vm_description }}"
+        boot_type: "{{ boot_type }}"
+        cluster:
+          name: "{{ cluster_name }}"
+        vcpus: "{{ vcpus }}"
+        cores_per_vcpu: "{{ cores_per_vcpu }}"
+        memory_gb: "{{ memory_gb }}"
+        disks:
+          - type: "DISK"
+            size_gb: "{{ disk_gb }}"
+            bus: "SCSI"
+            clone_image:
+              name: "{{ image_name }}"
+        networks:
+          - subnet:
+              cluster:
+                name: "{{ cluster_name }}"
+              name: "{{ subnet_name }}"
+            is_connected: true
+        power_state: "{{ 'on' if power_on else 'off' }}"
+        wait: true
+      register: vm_result
+
+    # Optional: apply cloud-init (supported parameter pattern)
+    - name: Apply cloud-init customization
+      when: use_cloud_init | bool
+      ntnx_vms:
+        nutanix_host: "{{ ntnx_host }}"
+        nutanix_username: "{{ ntnx_username }}"
+        nutanix_password: "{{ ntnx_password }}"
+        validate_certs: "{{ ntnx_validate_certs }}"
+        state: present
+        name: "{{ vm_name }}"
+        guest_customization:
+          type: "cloud_init"
+          script_path: "{{ cloud_init_path }}"
+          is_overridable: true
+        wait: true
+      register: cloud_init_result
+
+    - name: Show VM result
+      debug:
+        var: vm_result
+
