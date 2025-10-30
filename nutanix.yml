@@ -1,8 +1,28 @@
-plugin: nutanix.ncp.ntnx_prism_vm_inventory
-host: "{{ lookup('env', 'NUTANIX_HOST') }}"
-username: "{{ lookup('env', 'NUTANIX_USERNAME') }}"
-password: "{{ lookup('env', 'NUTANIX_PASSWORD') }}"
-validate_certs: "{{ lookup('env','NUTANIX_VALIDATE_CERTS') | default('false') | bool }}"
+---
+plugin: nutanix.ncp.plugins.inventory.ntnx_prism_vm_inventory
+
+# Required auth to Prism (Central or Element)
+nutanix_hostname: "{{ lookup('env', 'NUTANIX_HOST') }}"
+nutanix_username: "{{ lookup('env', 'NUTANIX_USERNAME') }}"
+nutanix_password: "{{ lookup('env', 'NUTANIX_PASSWORD') }}"
+validate_certs: "{{ (lookup('env', 'NUTANIX_VALIDATE_CERTS') | default('false')) | bool }}"
+
+# Optional: which Prism endpoint type to talk to.
+# Some versions of the plugin expect this and some infer it.
+# Valid values are commonly 'pc' (Prism Central) or 'pe' (Prism Element).
+# If you know you are talking to Prism Central, uncomment this:
+# prism_type: pc
+
+# Compose tells Ansible how to set ansible_host for each VM in inventory.
+# The plugin returns data per-VM (often including ip_address or similar),
+# so map that to ansible_host so Ansible knows how to SSH.
 compose:
   ansible_host: ip_address
+
+# You can also group by attributes. Example:
+# keyed_groups:
+#   - key: cluster_name
+#     prefix: nutanix_cluster
+#
+# That would create groups like nutanix_cluster_ProdCluster, etc.
 
