@@ -1,4 +1,3 @@
----
 plugin: nutanix.ncp.plugins.inventory.ntnx_prism_vm_inventory
 
 # Required auth to Prism (Central or Element)
