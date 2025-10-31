@@ -1,12 +1,11 @@
 ---
 plugin: ansible_collections.nutanix.ncp.plugins.inventory.ntnx_prism_vm_inventory
 
-# These keys exist, but we leave them blank or with safe defaults.
 nutanix_hostname: ""
 nutanix_username: ""
 nutanix_password: ""
 validate_certs: false
-prism_type: pc     # or pe for Prism Element
+prism_type: pc        # or 'pe' for Prism Element
 
 compose:
   ansible_host: ip_address
