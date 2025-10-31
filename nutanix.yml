@@ -1,4 +1,5 @@
-plugin: nutanix.ncp.plugins.inventory.ntnx_prism_vm_inventory
+plugin: 
+  nutanix.ncp.plugins.inventory.ntnx_prism_vm_inventory
 
 # Required auth to Prism (Central or Element)
 nutanix_hostname: "{{ lookup('env', 'NUTANIX_HOST') }}"
